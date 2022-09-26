@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace GitTest
 {
@@ -24,7 +25,7 @@ namespace GitTest
         float totalElapsed;
         float timePerFrame;
 
-        bool personHit;
+        
 
         public Game1()
         {
@@ -69,8 +70,8 @@ namespace GitTest
 
             for(int i = 0; i <= 3; i++)
             {
-                ballPos[i].X = rand.Next(0, graphics.GraphicsDevice.Viewport.Width - 24);
-                ballPos[i].Y = rand.Next(0, graphics.GraphicsDevice.Viewport.Height - 24);
+                ballPos[i].X = rand.Next(0, _graphics.GraphicsDevice.Viewport.Width - 24);
+                ballPos[i].Y = rand.Next(0, _graphics.GraphicsDevice.Viewport.Height - 24);
                 ballColor[i] = rand.Next(0, 5);
             }
             // TODO: use this.Content to load your game content here
@@ -89,7 +90,7 @@ namespace GitTest
             if (keyboard.IsKeyDown(Keys.Up))
             {
                 chaState = 3;
-                chaPos.Y -= speed;
+                charPosition.Y -= 2;
             }
             if (keyboard.IsKeyDown(Keys.Left))
             {
@@ -104,9 +105,9 @@ namespace GitTest
             if (keyboard.IsKeyDown(Keys.Down))
             {
                 chaState = 0;
-                chaPos.Y += speed;
+                charPosition.Y += 2;
             }
-            if (ks.IsKeyUp(Keys.Up) && ks.IsKeyUp(Keys.Left) && ks.IsKeyUp(Keys.Right) && ks.IsKeyUp(Keys.Down))
+            if (keyboard.IsKeyUp(Keys.Up) && keyboard.IsKeyUp(Keys.Left) && keyboard.IsKeyUp(Keys.Right) && keyboard.IsKeyUp(Keys.Down))
             {
                 frame = 0;
             }
@@ -118,15 +119,15 @@ namespace GitTest
             {
                 ballRec[x] = new Rectangle((int)ballPos[x].X, (int)ballPos[x].Y, 24, 24);
 
-                if (charRec.Intersects(ballRec[x]))
+                if (charRectangle.Intersects(ballRec[x]))
                 {
-                    personHit= true;
-                    ballPos[x] = new Vector2(rand.Next(24, graphics.GraphicsDevice.Viewport.Width - ball.Width), rand.Next(0, graphics.GraphicsDevice.Viewport.Height - 24));
+                    personHit = true;
+                    ballPos[x] = new Vector2(rand.Next(24, _graphics.GraphicsDevice.Viewport.Width - ballTexture.Width), rand.Next(0, _graphics.GraphicsDevice.Viewport.Height - 24));
                     ballColor[x] = rand.Next(0, 5);
                     break;
                     
                 }
-                else if (!charRec.Intersects(ballRec[x]))
+                else if (!charRectangle.Intersects(ballRec[x]))
                 {
                     personHit = false;
                 }
@@ -150,7 +151,7 @@ namespace GitTest
                 {
                     device.Clear(Color.CornflowerBlue);
                 }
-                spriteBatch.Draw(ball, ballPos[i], new Rectangle(24*ballColor[i], 0, 24, 24), Color.White);
+                _spriteBatch.Draw(ballTexture, ballPos[i], new Rectangle(24*ballColor[i], 0, 24, 24), Color.White);
 
             }
             _spriteBatch.Draw(charTexture, charPosition, new Rectangle(32*frame, 48*chaState, 32, 48), Color.White);
