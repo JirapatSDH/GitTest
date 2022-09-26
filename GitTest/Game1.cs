@@ -10,6 +10,22 @@ namespace GitTest
         private SpriteBatch _spriteBatch;
         Texture2D ballTexture;
         Texture2D charTexture;
+        Vector2 charPosition = new Vector2(0, 250);
+        Vector2 ballPosition = new Vector2(250, 250);
+
+        Vector2[] ballPos = new Vector2[4];
+
+        Random rand;
+        Color[] bgColor;
+        bool personHit;
+
+        int frame, chaState, framePerSec;
+        int[] ballColor;
+        float totalElapsed;
+        float timePerFrame;
+
+        bool personHit;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -29,26 +45,127 @@ namespace GitTest
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             ballTexture = Content.Load<Texture2D>("ball");
             charTexture = Content.Load<Texture2D>("Char01");
+
+                  //Animate
+            framePerSec = 5;
+            timePerFrame = (float)1 / framePerSec;
+            frame = 0;
+            totalElapsed = 0;
+
+
+            rand = new Random();
+            ballColor = new int[6];
+
+            //bgNum = new int[6];
+            bgColor = new Color[6];
+            #region BGColor
+            bgColor[0] = Color.Red;
+            bgColor[1] = Color.Purple; 
+            bgColor[2] = Color.LightGreen;
+            bgColor[3] = Color.Yellow;
+            bgColor[4] = Color.Pink;
+            bgColor[5] = Color.SkyBlue;
+            #endregion
+
+            for(int i = 0; i <= 3; i++)
+            {
+                ballPos[i].X = rand.Next(0, graphics.GraphicsDevice.Viewport.Width - 24);
+                ballPos[i].Y = rand.Next(0, graphics.GraphicsDevice.Viewport.Height - 24);
+                ballColor[i] = rand.Next(0, 5);
+            }
             // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            GraphicsDevice device = _graphics.GraphicsDevice;
 
-            // TODO: Add your update logic here
+            UpdateFrame((float)gameTime.ElapsedGameTime.TotalSeconds);
 
+            KeyboardState keyboard = Keyboard.GetState();
+
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                this.Exit();
+            if (keyboard.IsKeyDown(Keys.Up))
+            {
+                chaState = 3;
+                chaPos.Y -= speed;
+            }
+            if (keyboard.IsKeyDown(Keys.Left))
+            {
+                chaState = 1;
+                charPosition.X = charPosition.X - 2;
+            }
+            if (keyboard.IsKeyDown(Keys.Right))
+            {
+                chaState = 2;
+                charPosition.X = charPosition.X + 2;
+            }
+            if (keyboard.IsKeyDown(Keys.Down))
+            {
+                chaState = 0;
+                chaPos.Y += speed;
+            }
+            if (ks.IsKeyUp(Keys.Up) && ks.IsKeyUp(Keys.Left) && ks.IsKeyUp(Keys.Right) && ks.IsKeyUp(Keys.Down))
+            {
+                frame = 0;
+            }
+
+            Rectangle charRectangle = new Rectangle((int)charPosition.X, (int)charPosition.Y, 32, 48);
+            Rectangle[] ballRec = new Rectangle[4];
+
+             for(int x = 0; x < 4; x++)
+            {
+                ballRec[x] = new Rectangle((int)ballPos[x].X, (int)ballPos[x].Y, 24, 24);
+
+                if (charRec.Intersects(ballRec[x]))
+                {
+                    personHit= true;
+                    ballPos[x] = new Vector2(rand.Next(24, graphics.GraphicsDevice.Viewport.Width - ball.Width), rand.Next(0, graphics.GraphicsDevice.Viewport.Height - 24));
+                    ballColor[x] = rand.Next(0, 5);
+                    break;
+                    
+                }
+                else if (!charRec.Intersects(ballRec[x]))
+                {
+                    personHit = false;
+                }
+
+            }
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice device = _graphics.GraphicsDevice;
+          
+            _spriteBatch.Begin();
+            for(int i = 0; i<4 ; i++)
+            {
+                if (personHit)
+                {
+                    device.Clear(bgColor[ballColor[i]]);
+                }
+                else
+                {
+                    device.Clear(Color.CornflowerBlue);
+                }
+                spriteBatch.Draw(ball, ballPos[i], new Rectangle(24*ballColor[i], 0, 24, 24), Color.White);
 
-            // TODO: Add your drawing code here
-
+            }
+            _spriteBatch.Draw(charTexture, charPosition, new Rectangle(32*frame, 48*chaState, 32, 48), Color.White);
+            _spriteBatch.End(); 
             base.Draw(gameTime);
+        }
+
+        void UpdateFrame(float elapsed)
+        {
+            totalElapsed += elapsed;
+            if (totalElapsed > timePerFrame)
+            {
+                frame = (frame + 1) % 4;
+                totalElapsed -= timePerFrame;
+            }
         }
     }
 }
