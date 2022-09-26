@@ -122,7 +122,7 @@ namespace GitTest
                 {
                     personHit = true;
                     ballPos[x] = new Vector2(rand.Next(24, _graphics.GraphicsDevice.Viewport.Width - ballTexture.Width), rand.Next(0, _graphics.GraphicsDevice.Viewport.Height - 24));
-                    ballColor[x] = rand.Next(0, 5);
+                    ballColor[x] = rand.Next(0, 4);
                     break;
 
                 }
